@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import requests
 from dotenv import load_dotenv
 from atlassian import Confluence
@@ -36,27 +37,39 @@ def publish_to_confluence(confluence_url, username, api_token, space_key, title,
             type='page',
             representation='storage'
         )
-        print(f"Page '{title}' created successfully.")
+        page_id = confluence.get_page_id(space=space_key, title=title)
+        
+        print(f"Page '{title}' created with '{page_id}' successfully.")
 
-    # Upload the image to the page using requests
-    with open(image_path, 'rb') as image_file:
-        image_data = image_file.read()
-        image_filename = os.path.basename(image_path)
-        upload_url = f"{confluence_url}/rest/api/content/{page_id}/child/attachment"
-        headers = {
-            'X-Atlassian-Token': 'no-check'
-        }
-        files = {
-            'file': (image_filename, image_data, 'application/octet-stream')
-        }
-        response = requests.post(
-            upload_url,
-            headers=headers,
-            auth=(username, api_token),
-            files=files
-        )
-        response.raise_for_status()
-        print(f"Image '{image_filename}' uploaded successfully.")
+    # Check if the image already exists as an attachment
+    image_filename = os.path.basename(image_path)
+    attachments = confluence.get_attachments_from_content(page_id)
+    attachment_exists = any(attachment['title'] == image_filename for attachment in attachments['results'])
+
+    if not attachment_exists:
+        # Upload the image to the page using requests
+        with open(image_path, 'rb') as image_file:
+            image_data = image_file.read()
+            upload_url = f"{confluence_url}/rest/api/content/{page_id}/child/attachment"
+            headers = {
+                'X-Atlassian-Token': 'no-check'
+            }
+            files = {
+                'file': (image_filename, image_data, 'application/octet-stream')
+            }
+            response = requests.post(
+                upload_url,
+                headers=headers,
+                auth=(username, api_token),
+                files=files
+            )
+            response.raise_for_status()
+            print(f"Image '{image_filename}' uploaded successfully.")
+    else:
+        print(f"Image '{image_filename}' already exists. Skipping upload.")
+
+    # Wait for a short period to allow Confluence to process the image
+    time.sleep(5)  # Adjust the delay as needed
 
     # Update the page content to include the image
     image_macro = f"""
