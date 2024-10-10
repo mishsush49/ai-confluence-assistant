@@ -6,9 +6,12 @@ from dotenv import load_dotenv
 from atlassian import Confluence
 from openai import OpenAI
 
+# Load environment variables from .env file
+load_dotenv();
+
 client = OpenAI(
     # defaults to os.environ.get("OPENAI_API_KEY")
-    api_key='private',
+    api_key=os.getenv("OPENAI_API_KEY"),
 )
 
 def generate_content_from_openai(conf_prompt_file_path, common_prompt_file_path):
@@ -117,9 +120,6 @@ def publish_to_confluence(confluence_url, username, api_token, space_key, title,
     print(f"Page '{title}' updated with image successfully.")
 
 def main():
-    # Load environment variables from .env file
-    load_dotenv()
-
     # Read configuration from .env file
     confluence_url = os.getenv('CONFLUENCE_URL')
     username = os.getenv('CONFLUENCE_USERNAME')
