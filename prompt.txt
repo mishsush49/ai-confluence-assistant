@@ -1,18 +1,12 @@
-Objective: Generate a Python script that publishes content along with an image to a Confluence page. The script should read important configuration details such as Confluence URL, username, API token, and space key from a .env file. The image path should be passed as a command-line argument.
-
-Requirements:
-A. Configuration Details:
-1. Read Confluence URL, username, API token, and space key from a .env file.
-2. Use the python-dotenv package to load environment variables from the .env file.
-
-B. Image Upload:
-1. The image path should be passed as a command-line argument.
-2. Use the requests library to upload the image to the Confluence page.
-3. Ensure the image is uploaded as binary data without any decoding issues.
-
-C. Page Creation/Update:
-1. Check if the page already exists. If it does, update the existing page; otherwise, create a new page.
-2. Update the page content to include the uploaded image using the <ac:image> macro.
-
-D. Error Handling:
-1. Handle any potential errors, such as incorrect image paths or API issues.
+As a solution architect, i want you to write detailed nice summary for the architecture diagram
+I draw for following components
+Following components should be present
+1. Frontend minified JS and html stored in S3
+2. Frontend URLs are hosted via cloudfront
+3. Frontend is talking to ECS backend via websocket
+4. Backend ECS is connected to Lex
+5. Polly is used for text to speech for some text on Frontend
+6. Final recording will be saved to S3
+7. Part 1 recording will be passed to automarker to check what will be the rating
+8. Frontend contents will be received from another microservices which will be connected to Aurora
+postgreSql database serverless V2a

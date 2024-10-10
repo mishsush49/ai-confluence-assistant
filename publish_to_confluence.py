@@ -4,6 +4,23 @@ import time
 import requests
 from dotenv import load_dotenv
 from atlassian import Confluence
+from openai import OpenAI
+
+client = OpenAI(
+    # defaults to os.environ.get("OPENAI_API_KEY")
+    api_key='private',
+)
+
+def generate_content_from_openai(prompt_file_path):
+    # Read the prompt from the file
+    with open(prompt_file_path, 'r') as file:
+        prompt = file.read().strip()
+
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response.choices[0].message.content.strip()
 
 def publish_to_confluence(confluence_url, username, api_token, space_key, title, content, image_path):
     confluence = Confluence(
@@ -97,7 +114,7 @@ def main():
     username = os.getenv('CONFLUENCE_USERNAME')
     api_token = os.getenv('CONFLUENCE_API_TOKEN')
     space_key = os.getenv('CONFLUENCE_SPACE_KEY')
-
+    
     # Check if the image path is provided as an argument
     if len(sys.argv) < 2:
         print("Usage: python script.py <image_path>")
@@ -105,12 +122,12 @@ def main():
 
     image_path = sys.argv[1]
 
-    # Define the content and title of the Confluence page
+    # Define the title of the Confluence page
     title = "Automated Confluence Page"
-    content = """
-    <p>This is a sample Confluence page created using Python.</p>
-    <p>Below is an image:</p>
-    """
+
+    # Generate content using OpenAI
+    prompt_file_path = os.path.join(os.path.dirname(__file__), 'prompt.txt')
+    content = generate_content_from_openai(prompt_file_path)
 
     # Publish the content to Confluence
     publish_to_confluence(confluence_url, username, api_token, space_key, title, content, image_path)
