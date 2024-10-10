@@ -11,14 +11,25 @@ client = OpenAI(
     api_key='private',
 )
 
-def generate_content_from_openai(prompt_file_path):
-    # Read the prompt from the file
-    with open(prompt_file_path, 'r') as file:
-        prompt = file.read().strip()
+def generate_content_from_openai(conf_prompt_file_path, common_prompt_file_path):
+    
+    # Combine both file paths into a list
+    file_paths = [conf_prompt_file_path, common_prompt_file_path]
+
+    # Initialize an empty string to store the combined prompt
+    combined_prompt = ""
+
+    # Loop through each file path and read the contents
+    for file_path in file_paths:
+        with open(file_path, 'r') as file:
+            combined_prompt += file.read().strip() + "\n"  # Add a newline between prompts for clarity
+
+    # Remove the trailing newline if needed
+    combined_prompt = combined_prompt.rstrip()
 
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": combined_prompt}]
     )
     return response.choices[0].message.content.strip()
 
@@ -126,8 +137,9 @@ def main():
     title = "Automated Confluence Page"
 
     # Generate content using OpenAI
-    prompt_file_path = os.path.join(os.path.dirname(__file__), 'prompt.txt')
-    content = generate_content_from_openai(prompt_file_path)
+    common_prompt_file_path = os.path.join(os.path.dirname(__file__), 'prompt-common.txt')
+    conf_prompt_file_path = os.path.join(os.path.dirname(__file__), 'prompt-conf.txt')
+    content = generate_content_from_openai(conf_prompt_file_path, common_prompt_file_path)
 
     # Publish the content to Confluence
     publish_to_confluence(confluence_url, username, api_token, space_key, title, content, image_path)

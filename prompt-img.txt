@@ -1,0 +1,2 @@
+As an experienced solution architect with a great knowledge of Python and Mingrammer, i want you to generate 
+python mingrammer scripts for the below components - 

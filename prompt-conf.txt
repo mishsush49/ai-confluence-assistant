@@ -1,0 +1,2 @@
+As a solution architect, i want you to write nice detailed summary for the architecture diagram which I 
+will be drawing for below components -
