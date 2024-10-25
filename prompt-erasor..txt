@@ -1,0 +1,2 @@
+As an experienced solution architect, i want you to generate architecture diagram for below components. 
+Generated image should be of level of AWS reference architecture diagram - 
